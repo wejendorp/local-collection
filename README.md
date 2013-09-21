@@ -9,10 +9,7 @@ only exists once in the application.
 
 This will allow views using the same model to always stay in sync.
 
-The only requirements for the model is that the methods `model.set`
-and `model.primary` exist.
-The collection will be namespaced with `model.modelName` or the `options.name` parameter.
-
+It is built to contain instances of [component/model](https://github.com/component/model).
 
 ## Installation
 
@@ -38,23 +35,18 @@ var me = UserCollection.obtain('me');
 
 ## API
 
-### populate(models)
-Populates the store with a list of models.
+### set(models, options)
+Adds the model(s) to cache or updates an already existing model with the same id.
 
-### clear()
-Clears the collection store
-
-### add(model)
-Adds the model to cache, overwriting an already existing model with the same id.
-
-### upsert(model)
-Adds the model to cache or updates an already existing model with the same id.
-
-### obtain(id)
+### obtain(id, options)
 Returns the model with the chosen id from cache.
 
 ### remove(id)
 Removes the model from cache.
+
+### clear()
+Clears the collection store
+
 
 ### Enumerable
 All [component/enumerable](https://github.com/component/enumerable) methods are available
@@ -62,9 +54,10 @@ for filtering and processing.
 
 
 ## Dependencies
-[component/emitter](https://github.com/component/emitter)
-[component/enumerable](https://github.com/component/enumerable)
-[nbubna/store](https://github.com/nbubna/store)
+
+- [component/emitter](https://github.com/component/emitter)
+- [component/enumerable](https://github.com/component/enumerable)
+- [nbubna/store](https://github.com/nbubna/store)
 
 ## License
 MIT

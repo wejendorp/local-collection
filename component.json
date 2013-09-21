@@ -1,0 +1,17 @@
+{
+  "name": "local-collection",
+  "description": "Model collection with localStorage persistance",
+  "dependencies": {
+    "component/emitter": "*",
+    "component/enumerable": "*",
+
+    "nbubna/store": "*"
+  },
+  "development": {
+
+  },
+  "main": "index.js",
+  "scripts": [
+    "index.js"
+  ]
+}
