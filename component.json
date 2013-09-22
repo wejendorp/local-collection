@@ -12,8 +12,9 @@
     "component/assert" : "*",
     "component/model":"*"
   },
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": [
-    "index.js"
+    "lib/index.js",
+    "lib/proto.js"
   ]
 }

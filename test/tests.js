@@ -5,12 +5,14 @@ var store = require('store');
 var assert = require('assert');
 
 var testModel = require('model')('test').attr('id').attr('name');
+var testCollection = LocalCollection(testModel);
 
 describe('local-collection', function() {
   var collection;
   beforeEach(function() {
     store.clearAll();
-    collection = new LocalCollection(testModel);
+    collection = new testCollection();
+    collection.clear();
   });
 
   describe('initialization', function() {;
@@ -44,6 +46,7 @@ describe('local-collection', function() {
       assert(model.id() === 1, 'returned instance has wrong id');
     });
     it('should work for multiple values', function() {
+      console.log('begin multi');
       collection.set([
         {id: 1}, {id: 2}
       ]);
@@ -76,7 +79,7 @@ describe('local-collection', function() {
       assert(m2.name() === 'Morpheus');
     });
     it('should return null on missing id', function() {
-      assert(collection.obtain('0') === null);
+      assert(collection.obtain('IDontExist') === null);
     });
     it('should emit add on create', function(done) {
       var id = 'beef';
@@ -85,6 +88,7 @@ describe('local-collection', function() {
         assert(m.id() === id, 'emitted instance has wrong id')
         done();
       });
+      debugger;
       collection.obtain(id, {create: true});
     });
   });
