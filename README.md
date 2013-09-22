@@ -21,7 +21,7 @@ It is built to contain instances of [component/model](https://github.com/compone
 // user-collection
 var LocalCollection = require('local-collection');
 
-var model = require('user');
+var model = require('model').attr('id');
 module.exports = new LocalCollection(model);
 ```
 
@@ -35,7 +35,7 @@ var me = UserCollection.obtain('me');
 
 ## API
 
-### set(models, options)
+### set(models)
 Adds the model(s) to cache or updates an already existing model with the same id.
 
 ### obtain(id, options)

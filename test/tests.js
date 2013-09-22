@@ -79,7 +79,27 @@ describe('local-collection', function() {
   });
 
   describe('remove', function() {
-
+    var id = 'id';
+    var model;
+    beforeEach(function() {
+      model = collection.set({id: id});
+    });
+    it('should remove the model by id', function() {
+      collection.remove(id);
+      assert(!collection.obtain(id));
+    });
+    it('should remove by model instance', function() {
+      collection.remove(model);
+      assert(!collection.obtain(id));
+    });
+    it('should emit remove event', function(done) {
+      collection.once('remove', function(m) {
+        assert(m instanceof testModel, 'should pass model instance');
+        assert(m.id() === id, 'emitted instance has wrong id');
+        done();
+      });
+      collection.remove(id);
+    });
   });
   describe('clear', function() {
     before(function() {
