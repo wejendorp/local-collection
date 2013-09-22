@@ -19,8 +19,8 @@ describe('local-collection', function() {
       collection.emit('event');
     });
     it('should create a namespaced store', function(){
-      collection.store('name', 'space');
-      assert(store('test.name') === 'space');
+      store('test.name', {id:'space'});
+      assert(collection.obtain('name').id() === 'space');
     });
     it('should be empty', function() {
       assert(collection.length() === 0, 'is not empty');
@@ -120,7 +120,6 @@ describe('local-collection', function() {
     it('should remove all values', function() {
       collection.clear();
       assert(collection.length() === 0);
-      assert(collection.store.size() === 0);
     });
   });
 });

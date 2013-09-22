@@ -20,8 +20,6 @@ var Store      = require('store');
 function Collection(model, name) {
   if(!this instanceof Collection) return new Collection(model);
 
-  this.store = Store.namespace(name || model.modelName);
-
   this.model = model;
   this.model.prototype.collection = this;
 
@@ -33,8 +31,11 @@ function Collection(model, name) {
     collection.remove(this);
   };
 
-  this.models = {};
-  this.keys = Object.keys(this.store.getAll());
+  this.collection = Collection;
+  this.collection.models = {};
+  this.collection.store = Store.namespace(name || model.modelName);
+
+  this.keys = Object.keys(this.collection.store.getAll());
 }
 
 
@@ -91,7 +92,10 @@ Collection.prototype.length = function(){
 
 Collection.prototype._addKey = function(key) {
   this.keys.push(key);
-  this.store.set('keys', this.keys);
+
+  var total = this.collection.store('keys') || [];
+  total.push(key);
+  this.collection.store.set('keys', total);
 };
 
 
@@ -104,7 +108,10 @@ Collection.prototype._addKey = function(key) {
 
 Collection.prototype._removeKey = function(key) {
   this.keys.splice(this.keys.indexOf(key), 1);
-  this.store.set('keys', this.keys);
+
+  var total = this.collection.store('keys') || [];
+  total.splice(total.indexOf(key), 1);
+  this.collection.store.set('keys', total);
 };
 
 
@@ -128,10 +135,10 @@ Collection.prototype.set = function(models) {
     // If its a model we store the instance as the new truth
     if(model instanceof collection.model) {
       key = model.primary();
-      var exists = collection.models[key];
+      var exists = collection.collection.models[key];
 
-      collection.models[key] = model;
-      collection.store.set(key, model);
+      collection.collection.models[key] = model;
+      collection.collection.store.set(key, model);
 
       if(!exists) {
         collection._addKey(key);
@@ -146,7 +153,7 @@ Collection.prototype.set = function(models) {
     model = collection.obtain(data[pk]);
     if(model) {
       model.set(data);
-      collection.store.set(data[pk], model);
+      collection.collection.store.set(data[pk], model);
       return model;
     }
 
@@ -154,8 +161,8 @@ Collection.prototype.set = function(models) {
     model = new collection.model(data);
     key = model.primary();
 
-    collection.models[key] = model;
-    collection.store.set(key, model);
+    collection.collection.models[key] = model;
+    collection.collection.store.set(key, model);
     collection._addKey(key);
 
     collection.emit('add', model);
@@ -177,19 +184,19 @@ Collection.prototype.set = function(models) {
  */
 
 Collection.prototype.obtain = function(id, create) {
-  var model = this.models[id];
+  var model = this.collection.models[id];
   if(model) return model;
 
-  var data = this.store.get(id);
+  var data = this.collection.store.get(id);
   if(data)
-    return this.models[id] = new this.model(data);
+    return this.collection.models[id] = new this.model(data);
 
   if(create) {
     model = new this.model();
     model.primary(id);
 
-    this.models[id] = model;
-    this.store.set(id, model);
+    this.collection.models[id] = model;
+    this.collection.store.set(id, model);
     this._addKey(id);
     this.emit('add', model);
 
@@ -206,12 +213,9 @@ Collection.prototype.obtain = function(id, create) {
 
 Collection.prototype.clear = function() {
   // Properly remove and emit for active models
-  for(var key in this.models) {
-    var model = this.models[key];
-    this.remove(model);
+  for(var key in this.keys) {
+    this.remove(key);
   }
-  // And just trash the rest
-  this.store.clear();
 };
 
 
@@ -228,11 +232,11 @@ Collection.prototype.remove = function(model) {
   if(model instanceof this.model)
     id = model.primary();
 
-  model = this.models[id];
+  model = this.collection.models[id];
   if(model)
-    delete this.models[id];
+    delete this.collection.models[id];
 
-  this.store.remove(id);
+  this.collection.store.remove(id);
   this._removeKey(id);
 
   // Not sure about what to emit
