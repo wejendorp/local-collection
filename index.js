@@ -95,7 +95,7 @@ Collection.prototype.set = function(models) {
     }
 
     // No data found, create a model
-    model = collection.model(data);
+    model = new collection.model(data);
     key = model.primary();
 
     collection.models[key] = model;

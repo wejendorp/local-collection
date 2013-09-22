@@ -15,7 +15,7 @@ describe('local-collection', function() {
 
   describe('initialization', function() {;
     it('should be an emitter', function(done) {
-      collection.on('event', done);
+      collection.once('event', done);
       collection.emit('event');
     });
     it('should create a namespaced store', function(){
@@ -43,13 +43,18 @@ describe('local-collection', function() {
     });
     it('should emit add event', function(done) {
       var id = 'beef';
-      assert(!collection.obtain('beef'), 'collection already has beef');
-
-      collection.on('add', function(m) {
+      collection.once('add', function(m) {
         assert(m instanceof testModel, 'does not pass model instance');
         assert(m.id() === id, 'emitted instance has wrong id')
+        done();
       });
       collection.set({id: id});
+    });
+    it('should overwrite current instance if given a model', function() {
+      var m1 = collection.set({id: 'm1', name:'m1'});
+      var m2 = new testModel({id: 'm1', name:'overwrite'});
+      collection.set(m2);
+      assert(collection.obtain('m1').name() === 'overwrite');
     });
   });
 
@@ -62,6 +67,15 @@ describe('local-collection', function() {
     });
     it('should return null on missing id', function() {
       assert(collection.obtain('0') === null);
+    });
+    it('should emit add on create', function(done) {
+      var id = 'beef';
+      collection.once('add', function(m) {
+        assert(m instanceof testModel, 'does not pass model instance');
+        assert(m.id() === id, 'emitted instance has wrong id')
+        done();
+      });
+      collection.obtain(id, {create: true});
     });
   });
 
