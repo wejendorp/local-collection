@@ -42,7 +42,7 @@ Adds the model(s) to cache or updates an already existing model with the same id
 The model is extended with a `store` method, equivalent to `model.save`, but only
 writing to localStorage.
 
-### obtain(id, options)
+### obtain(id, create)
 Returns the model with the chosen id from cache.
 
 ### remove(id)

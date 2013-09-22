@@ -36,6 +36,7 @@ describe('local-collection', function() {
       assert(count === 2);
     });
   });
+
   describe('set', function() {
     it('should create model from data', function() {
       var model = collection.set({id: 1});
@@ -69,8 +70,8 @@ describe('local-collection', function() {
 
   describe('obtain', function() {
     it('should return same instance', function() {
-      var m1 = collection.obtain(3, {create:true});
-      var m2 = collection.obtain(3);
+      var m1 = collection.obtain(3, true);
+      var m2 = collection.obtain(3, true);
       m1.name('Morpheus');
       assert(m2.name() === 'Morpheus');
     });
@@ -111,6 +112,7 @@ describe('local-collection', function() {
       collection.remove(id);
     });
   });
+
   describe('clear', function() {
     before(function() {
       collection.set({id: 1});

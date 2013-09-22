@@ -173,17 +173,15 @@ Collection.prototype.set = function(models) {
  * @api public
  */
 
-Collection.prototype.obtain = function(id, options) {
+Collection.prototype.obtain = function(id, create) {
   var model = this.models[id];
   if(model) return model;
-
-  options = options || {};
 
   var data = this.store.get(id);
   if(data)
     return this.models[id] = new this.model(data);
 
-  if(options.create) {
+  if(create) {
     model = new this.model();
     model.primary(id);
 
