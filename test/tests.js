@@ -25,6 +25,16 @@ describe('local-collection', function() {
     it('should be empty', function() {
       assert(collection.length() === 0, 'is not empty');
     });
+    it('should be iterable', function() {
+      collection.set([{id:0}, {id: 1}]);
+
+      var count = 0;
+      collection.each(function(m, i) {
+        assert(m.id() === i);
+        count++;
+      });
+      assert(count === 2);
+    });
   });
   describe('set', function() {
     it('should create model from data', function() {
