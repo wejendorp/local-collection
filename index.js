@@ -13,15 +13,14 @@ var Store      = require('store');
  * Initialize a new collection with the given `model`.
  *
  * @param {Model} model
+ * @param {String} Name of collection, if not model.modelName
  * @api public
  */
 
-function Collection(model, options) {
+function Collection(model, name) {
   if(!this instanceof Collection) return new Collection(model);
-  options = options || {};
 
-
-  this.store = Store.namespace(options.name || model.modelName);
+  this.store = Store.namespace(name || model.modelName);
 
   this.model = model;
   this.model.prototype.collection = this;
@@ -35,11 +34,31 @@ function Collection(model, options) {
   this.keys = Object.keys(this.store.getAll());
 }
 
+
+/**
+ * Use the given plugin `fn()`.
+ *
+ * @param {Function} fn
+ * @return {Function} self
+ * @api public
+ */
+
+Collection.use = function(fn) {
+  fn(this);
+  return this;
+};
+
+
 // Lets emit add/remove
 Emitter(Collection.prototype);
 
 // Lets make it Enumerable
 Enumerable(Collection.prototype);
+
+/**
+ * Iterator implementation.
+ */
+
 Collection.prototype.__iterate__ = function(){
   var self = this;
   return {
@@ -47,20 +66,54 @@ Collection.prototype.__iterate__ = function(){
     get:    function(i) { return self.obtain(self.keys[i]); }
   };
 };
+
+
+/**
+ * Return the collection length.
+ *
+ * @return {Number}
+ * @api public
+ */
+
 Collection.prototype.length = function(){
   return this.keys.length;
 };
+
+/**
+ * Add a key to the iterator
+ *
+ * @param {String} key
+ * @api private
+ */
 
 Collection.prototype._addKey = function(key) {
   this.keys.push(key);
   this.store.set('keys', this.keys);
 };
+
+
+/**
+ * Add a key to the iterator
+ *
+ * @param {String} key
+ * @api private
+ */
+
 Collection.prototype._removeKey = function(key) {
   this.keys.splice(this.keys.indexOf(key), 1);
   this.store.set('keys', this.keys);
 };
 
-// CRUD it up
+
+/**
+ * Add a model or array of models to the collection, updating existing models if
+ * the ids are the same.
+ *
+ * @param {Object|Model|[Model]} models
+ * @return {Model|[Model]}
+ * @api public
+ */
+
 Collection.prototype.set = function(models) {
   var collection = this;
   var pk = this.model.primaryKey;
@@ -110,7 +163,16 @@ Collection.prototype.set = function(models) {
 };
 
 
-// Obtain model with the given id, with option to create if not exists
+/**
+ * Obtains a model from cache, or null if nothing is found. If create flag is
+ * set, will create a model instance with the given id if not found.
+ *
+ * @param {String} id to look up
+ * @param {Bool} create flag
+ * @return {Model|null}
+ * @api public
+ */
+
 Collection.prototype.obtain = function(id, options) {
   var model = this.models[id];
   if(model) return model;
@@ -135,7 +197,12 @@ Collection.prototype.obtain = function(id, options) {
   return null;
 };
 
-// Store methods
+/**
+ * Clears the collection, emitting remove events on active models.
+ *
+ * @api public
+ */
+
 Collection.prototype.clear = function() {
   // Properly remove and emit for active models
   for(var key in this.models) {
@@ -146,7 +213,15 @@ Collection.prototype.clear = function() {
   this.store.clear();
 };
 
-// Remove model by id
+
+/**
+ * Remove a model by id from the collection.
+ *
+ * @param {String|Model} id or model instance to remove
+ * @return {Model|null}
+ * @api public
+ */
+
 Collection.prototype.remove = function(model) {
   var id = model;
   if(model instanceof this.model)
@@ -161,8 +236,8 @@ Collection.prototype.remove = function(model) {
 
   // Not sure about what to emit
   this.emit('remove', model);
+  return model || null;
 };
-
 
 
 module.exports = Collection;
