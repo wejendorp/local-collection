@@ -41,9 +41,9 @@ describe('local-collection', function() {
 
   describe('set', function() {
     it('should create model from data', function() {
-      var model = collection.set({id: 1});
-      assert(model instanceof testModel, 'does not return model instance');
-      assert(model.id() === 1, 'returned instance has wrong id');
+      var models = collection.set({id: 1});
+      assert(models[0] instanceof testModel, 'does not return model instance');
+      assert(models[0].id() === 1, 'returned instance has wrong id');
     });
     it('should work for multiple values', function() {
       console.log('begin multi');
@@ -88,7 +88,6 @@ describe('local-collection', function() {
         assert(m.id() === id, 'emitted instance has wrong id')
         done();
       });
-      debugger;
       collection.obtain(id, {create: true});
     });
   });
@@ -97,7 +96,7 @@ describe('local-collection', function() {
     var id = 'id';
     var model;
     beforeEach(function() {
-      model = collection.set({id: id});
+      model = collection.set({id: id})[0];
     });
     it('should remove the model by id', function() {
       collection.remove(id);
