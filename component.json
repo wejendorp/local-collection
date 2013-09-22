@@ -8,7 +8,8 @@
     "nbubna/store": "*"
   },
   "development": {
-
+    "component/assert" : "*",
+    "component/model":"*"
   },
   "main": "index.js",
   "scripts": [

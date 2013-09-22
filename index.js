@@ -39,7 +39,7 @@ function Collection(model, options) {
 Emitter(Collection.prototype);
 
 // Lets make it Enumerable
-Enumerable(collection);
+Enumerable(Collection.prototype);
 Collection.prototype.__iterate__ = function(){
   var self = this;
   return {
@@ -67,12 +67,12 @@ Collection.prototype.set = function(models) {
 
   if(!Array.isArray(models)) models = [models];
 
-  return models.map(function(model) {
+  var ret = models.map(function(model) {
     var key;
     // If its a model we store the instance as the new truth
     if(model instanceof collection.model) {
       key = model.primary();
-      var exists = !!collection.models[key];
+      var exists = collection.models[key];
 
       collection.models[key] = model;
       collection.store.set(key, model);
@@ -105,6 +105,8 @@ Collection.prototype.set = function(models) {
     collection.emit('add', model);
     return model;
   });
+  if(ret.length > 1) return ret;
+  return ret[0];
 };
 
 
@@ -123,6 +125,7 @@ Collection.prototype.obtain = function(id, options) {
     model = new this.model();
     model.primary(id);
 
+    this.models[id] = model;
     this.store.set(id, model);
     this._addKey(id);
     this.emit('add', model);
@@ -133,7 +136,7 @@ Collection.prototype.obtain = function(id, options) {
 };
 
 // Store methods
-collection.clear = function() {
+Collection.prototype.clear = function() {
   // Properly remove and emit for active models
   for(var key in this.models) {
     var model = this.models[key];
@@ -144,7 +147,7 @@ collection.clear = function() {
 };
 
 // Remove model by id
-collection.remove = function(model) {
+Collection.prototype.remove = function(model) {
   var id = model;
   if(model instanceof this.model)
     id = model.primary();
