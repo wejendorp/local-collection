@@ -29,6 +29,9 @@ function Collection(model, name) {
   this.model.prototype.store = function() {
     collection.set(this);
   };
+  this.model.prototype.remove = function() {
+    collection.remove(this);
+  };
 
   this.models = {};
   this.keys = Object.keys(this.store.getAll());
