@@ -27,9 +27,10 @@ module.exports = new LocalCollection(model);
 
 ```js
 var UserCollection = require('user-collection');
-// look up the key `user.me` and return a model:
-var me = UserCollection.obtain('me');
-
+// look up the key `user.me` and return a model even if it doesnt exist:
+var me = UserCollection.obtain('me', {create: true});
+me.name('Wejendorp');
+me.store(); // Write it back to collection.
 ```
 
 
@@ -37,6 +38,9 @@ var me = UserCollection.obtain('me');
 
 ### set(models)
 Adds the model(s) to cache or updates an already existing model with the same id.
+#### model.store()
+The model is extended with a `store` method, equivalent to `model.save`, but only
+writing to localStorage.
 
 ### obtain(id, options)
 Returns the model with the chosen id from cache.
