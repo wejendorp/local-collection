@@ -21,7 +21,7 @@ It is built to contain instances of [component/model](https://github.com/compone
 // user-collection
 var LocalCollection = require('local-collection');
 
-var model = require('model').attr('id');
+var model = require('model').attr('id').attr('name');
 module.exports = new LocalCollection(model);
 ```
 
