@@ -46,7 +46,6 @@ describe('local-collection', function() {
       assert(models[0].id() === 1, 'returned instance has wrong id');
     });
     it('should work for multiple values', function() {
-      console.log('begin multi');
       collection.set([
         {id: 1}, {id: 2}
       ]);
