@@ -29,7 +29,6 @@ describe('local-collection', function() {
   describe('set', function() {
     it('should create model from data', function() {
       var model = collection.set({id: 1});
-      console.log(model);
       assert(model instanceof testModel, 'does not return model instance');
       assert(model.id() === 1, 'returned instance has wrong id');
     });
