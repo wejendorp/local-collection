@@ -15,6 +15,7 @@
   "main": "lib/index.js",
   "scripts": [
     "lib/index.js",
-    "lib/proto.js"
+    "lib/proto.js",
+    "lib/static.js"
   ]
 }
