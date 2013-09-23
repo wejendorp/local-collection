@@ -89,6 +89,11 @@ describe('local-collection', function() {
       });
       collection.obtain(id, {create: true});
     });
+    it('returned models should be able to store self', function() {
+      var m1 = testCollection.obtain(3, true);
+      assert(typeof m1.store === 'function');
+      m1.store();
+    });
   });
 
   describe('remove', function() {
