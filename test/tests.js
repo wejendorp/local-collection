@@ -12,7 +12,6 @@ describe('local-collection', function() {
   beforeEach(function() {
     store.clearAll();
     collection = new testCollection();
-    collection.clear();
   });
 
   describe('initialization', function() {;
@@ -70,17 +69,20 @@ describe('local-collection', function() {
     });
   });
   describe('store', function() {
+    var id = 'ctr';
+    it('should serialize to array of keys', function() {
+      assert(Array.isArray(collection.toJSON()));
+    });
     it('should save a collection instance under its constructor id', function() {
-      var id = 'ctr';
       var c = new testCollection(null, id);
       c.store();
-      assert(!!c.collection.store(id));
+      console.log(localStorage);
+      assert(store('test.'+id));
     });
     it('should save a collection under id given', function() {
-      var id = 'ctr';
       var c = new testCollection();
       c.store(id);
-      assert(!!c.collection.store(id));
+      assert(store('test.'+id));
     });
   });
 
@@ -89,6 +91,7 @@ describe('local-collection', function() {
     beforeEach(function() {
       var c = new testCollection();
       c.store(id);
+      assert(testCollection.obtain(id));
     });
     it('should return a collection instance', function() {
       var c = testCollection.obtain(id);
@@ -97,12 +100,15 @@ describe('local-collection', function() {
     it('should return same collection handle', function() {
       var c1 = testCollection.obtain(id);
       var c2 = testCollection.obtain(id);
-      assert(c1 == c2);
+      assert(c1);
+      assert(c2);
+      assert(c1 === c2);
     });
     it('should return null on missing id', function() {
       assert(testCollection.obtain('garbage') === null);
     });
   });
+
   describe('obtainOne', function() {
     it('should return same instance', function() {
       var m1 = collection.obtainOne(3, true);
