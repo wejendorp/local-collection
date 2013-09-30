@@ -22,7 +22,7 @@ describe('local-collection', function() {
     });
     it('should create a namespaced store', function(){
       store('test.name', {id:'space'});
-      assert(collection.obtain('name').id() === 'space');
+      assert(collection.obtainOne('name').id() === 'space');
     });
     it('should be empty', function() {
       assert(collection.length() === 0, 'is not empty');
@@ -50,8 +50,8 @@ describe('local-collection', function() {
         {id: 1}, {id: 2}
       ]);
       assert(collection.length() === 2);
-      assert(collection.obtain(1));
-      assert(collection.obtain(2));
+      assert(collection.obtainOne(1));
+      assert(collection.obtainOne(2));
     });
     it('should emit add event', function(done) {
       var id = 'beef';
@@ -66,19 +66,52 @@ describe('local-collection', function() {
       var m1 = collection.set({id: 'm1', name:'m1'});
       var m2 = new testModel({id: 'm1', name:'overwrite'});
       collection.set(m2);
-      assert(collection.obtain('m1').name() === 'overwrite');
+      assert(collection.obtainOne('m1').name() === 'overwrite');
+    });
+  });
+  describe('store', function() {
+    it('should save a collection instance under its constructor id', function() {
+      var id = 'ctr';
+      var c = new testCollection(null, id);
+      c.store();
+      assert(!!c.collection.store(id));
+    });
+    it('should save a collection under id given', function() {
+      var id = 'ctr';
+      var c = new testCollection();
+      c.store(id);
+      assert(!!c.collection.store(id));
     });
   });
 
   describe('obtain', function() {
+    var id = 'myId';
+    beforeEach(function() {
+      var c = new testCollection();
+      c.store(id);
+    });
+    it('should return a collection instance', function() {
+      var c = testCollection.obtain(id);
+      assert(c instanceof testCollection);
+    });
+    it('should return same collection handle', function() {
+      var c1 = testCollection.obtain(id);
+      var c2 = testCollection.obtain(id);
+      assert(c1 == c2);
+    });
+    it('should return null on missing id', function() {
+      assert(testCollection.obtain('garbage') === null);
+    });
+  });
+  describe('obtainOne', function() {
     it('should return same instance', function() {
-      var m1 = collection.obtain(3, true);
-      var m2 = collection.obtain(3, true);
+      var m1 = collection.obtainOne(3, true);
+      var m2 = collection.obtainOne(3, true);
       m1.name('Morpheus');
       assert(m2.name() === 'Morpheus');
     });
     it('should return null on missing id', function() {
-      assert(collection.obtain('IDontExist') === null);
+      assert(collection.obtainOne('IDontExist') === null);
     });
     it('should emit add on create', function(done) {
       var id = 'beef';
@@ -87,10 +120,10 @@ describe('local-collection', function() {
         assert(m.id() === id, 'emitted instance has wrong id')
         done();
       });
-      collection.obtain(id, {create: true});
+      collection.obtainOne(id, {create: true});
     });
     it('returned models should be able to store self', function() {
-      var m1 = testCollection.obtain(3, true);
+      var m1 = testCollection.obtainOne(3, true);
       assert(typeof m1.store === 'function');
       m1.store();
     });
@@ -104,11 +137,11 @@ describe('local-collection', function() {
     });
     it('should remove the model by id', function() {
       collection.remove(id);
-      assert(!collection.obtain(id));
+      assert(!collection.obtainOne(id));
     });
     it('should remove by model instance', function() {
       collection.remove(model);
-      assert(!collection.obtain(id));
+      assert(!collection.obtainOne(id));
     });
     it('should emit remove event', function(done) {
       collection.once('remove', function(m) {
